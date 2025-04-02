@@ -1,0 +1,576 @@
+/* Enhanced Material Design Dark Theme for Pizza Price Ranker */
+:root {
+    /* Base Theme Colors */
+    --background-color: #121212;
+    --surface-color: #1e1e1e;
+    --surface-color-lighter: #2d2d2d;
+    --primary-color: #BB86FC; /* Purple-ish accent color */
+    --primary-color-variant: #3700B3;
+    --secondary-color: #03DAC6; /* Teal accent color - Cyan */
+    --error-color: #CF6679;
+
+    /* Text colors */
+    --text-high-emphasis: rgba(255, 255, 255, 0.87); /* Primary text */
+    --text-medium-emphasis: rgba(255, 255, 255, 0.6); /* Secondary text */
+    --text-disabled: rgba(255, 255, 255, 0.38); /* Disabled text */
+
+    /* Interactive element colors */
+    --ripple-color: rgba(255, 255, 255, 0.1);
+    --hover-color: rgba(255, 255, 255, 0.05);
+    --focus-color: rgba(255, 255, 255, 0.12);
+
+    /* Shadows */
+    --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+
+    /* Spacing */
+    --spacing-unit: 8px;
+
+    /* Border radius */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 16px;
+
+    /* Color grading for pizzas */
+    --best-value-color: #4CAF50; /* Green for best value */
+    --good-value-color: #8BC34A; /* Light green for good value */
+    --medium-value-color: #FFEB3B; /* Yellow for medium value */
+    --poor-value-color: #FF9800; /* Orange for poor value */
+    --worst-value-color: #F44336; /* Red for worst value */
+
+    /* Sort indicators - Changed to cyan */
+    --sort-asc-color: #03DAC6; /* Cyan for sort indicators */
+    --sort-desc-color: #03DAC6; /* Cyan for sort indicators */
+}
+
+/* Reset and base styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-high-emphasis);
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: calc(var(--spacing-unit) * 2);
+}
+
+h1 {
+    color: var(--primary-color);
+    margin-bottom: calc(var(--spacing-unit) * 3);
+    font-weight: 400;
+    font-size: 2rem;
+    text-align: center;
+}
+
+/* Form styles */
+#pizzaForm {
+    background-color: var(--surface-color);
+    padding: calc(var(--spacing-unit) * 2);
+    border-radius: var(--border-radius-md);
+    margin-bottom: calc(var(--spacing-unit) * 3);
+    box-shadow: var(--shadow-1);
+    /* Center form contents */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Input field container */
+.input-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+}
+
+input {
+    background-color: var(--surface-color-lighter);
+    color: var(--text-high-emphasis);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--border-radius-sm);
+    padding: calc(var(--spacing-unit) * 1.5);
+    margin: var(--spacing-unit);
+    width: calc(100% - var(--spacing-unit) * 2);
+    max-width: 300px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    /* Center inputs by displaying as block and using auto margins */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.3);
+}
+
+input::placeholder {
+    color: var(--text-medium-emphasis);
+}
+
+/* Remove spinner buttons from number inputs - comprehensive approach */
+/* For Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* For Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* Additional class for more specific targeting */
+.no-spinner {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: calc(var(--spacing-unit) * 2);
+    flex-wrap: wrap;
+    margin-top: calc(var(--spacing-unit) * 2);
+    width: 100%;
+}
+
+button {
+    background-color: var(--primary-color);
+    color: #000000;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 2.5);
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: var(--shadow-1);
+    min-width: 120px;
+}
+
+button:hover {
+    background-color: #CBB2FC; /* Lighter variant of primary */
+    box-shadow: var(--shadow-2);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+.toggle-button {
+    background-color: var(--secondary-color);
+}
+
+.toggle-button:hover {
+    background-color: #66e9db; /* Lighter variant of secondary */
+}
+
+/* Regular table for desktop */
+.table-container {
+    width: 100%;
+    overflow-x: hidden;
+    margin-bottom: calc(var(--spacing-unit) * 2);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-1);
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+thead {
+    background-color: var(--surface-color-lighter);
+}
+
+/* Updated table header styles with improved sort indicators */
+th {
+    background-color: var(--surface-color-lighter);
+    color: var(--primary-color);
+    font-weight: 500;
+    padding: calc(var(--spacing-unit) * 1.5);
+    text-align: left;
+    position: relative;
+    border: none;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+/* Style for non-sortable rank header */
+th.rank {
+    cursor: default;
+    padding-right: calc(var(--spacing-unit) * 1.5);
+}
+
+th.sortable {
+    cursor: pointer;
+    padding-right: calc(var(--spacing-unit) * 3);
+    user-select: none;
+}
+
+/* Remove the default sort indicators */
+th.sortable::after {
+    content: "";
+}
+
+/* Enhanced sort indicators with thicker arrows in cyan color */
+th.sortable .sort-indicator {
+    position: absolute;
+    right: var(--spacing-unit);
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Show the active sort indicator */
+th.sort-active .sort-indicator {
+    opacity: 1;
+}
+
+/* Different icons and colors for ascending and descending - thicker triangles in cyan */
+th.sort-asc .sort-indicator::after {
+    content: "▲"; /* Triangle up - thicker */
+    color: var(--sort-asc-color);
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+th.sort-desc .sort-indicator::after {
+    content: "▼"; /* Triangle down - thicker */
+    color: var(--sort-desc-color);
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+td {
+    padding: calc(var(--spacing-unit) * 1.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-high-emphasis);
+    text-align: left;
+}
+
+tbody tr {
+    background-color: var(--surface-color);
+    transition: background-color 0.2s;
+}
+
+tbody tr:hover {
+    background-color: var(--hover-color);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Updated value-based color coding for rank on desktop - matching mobile gradient direction */
+.rank-value-1 {
+    position: relative;
+}
+.rank-value-1::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--best-value-color) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.rank-value-2 {
+    position: relative;
+}
+.rank-value-2::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--good-value-color) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.rank-value-3 {
+    position: relative;
+}
+.rank-value-3::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--medium-value-color) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.rank-value-4,
+.rank-value-5 {
+    position: relative;
+}
+.rank-value-4::before,
+.rank-value-5::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--poor-value-color) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.rank-value-worst {
+    position: relative;
+}
+.rank-value-worst::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--worst-value-color) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Make sure the text stays on top of the gradient */
+.rank-value-1,
+.rank-value-2,
+.rank-value-3,
+.rank-value-4,
+.rank-value-5,
+.rank-value-worst {
+    position: relative;
+}
+
+.rank-value-1 *,
+.rank-value-2 *,
+.rank-value-3 *,
+.rank-value-4 *,
+.rank-value-5 *,
+.rank-value-worst * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Card layout for mobile */
+.card-view {
+    display: none;
+}
+
+/* Mobile-friendly styles */
+@media (max-width: 768px) {
+    .container {
+        padding: var(--spacing-unit);
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: calc(var(--spacing-unit) * 2);
+    }
+
+    /* Mobile inputs */
+    input, button {
+        width: 100%;
+        max-width: 100%;
+        margin: var(--spacing-unit) 0;
+    }
+
+    .button-container {
+        flex-direction: column;
+        gap: var(--spacing-unit);
+    }
+
+    button {
+        width: 100%;
+    }
+
+    /* Hide regular table on mobile */
+    .table-container table {
+        display: none;
+    }
+
+    /* Show card view on mobile */
+    .card-view {
+        display: block;
+        margin-top: var(--spacing-unit);
+    }
+
+    .pizza-card {
+        background-color: var(--surface-color);
+        border-radius: var(--border-radius-md);
+        margin-bottom: calc(var(--spacing-unit) * 2);
+        padding: calc(var(--spacing-unit) * 2);
+        box-shadow: var(--shadow-1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Color gradient based on value ranking */
+    .pizza-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.15;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    /* Different gradients based on pizza rank */
+    .pizza-card.rank-1::before {
+        background: linear-gradient(135deg, var(--best-value-color) 0%, transparent 60%);
+    }
+
+    .pizza-card.rank-2::before {
+        background: linear-gradient(135deg, var(--good-value-color) 0%, transparent 60%);
+    }
+
+    .pizza-card.rank-3::before {
+        background: linear-gradient(135deg, var(--medium-value-color) 0%, transparent 60%);
+    }
+
+    .pizza-card.rank-4::before,
+    .pizza-card.rank-5::before {
+        background: linear-gradient(135deg, var(--poor-value-color) 0%, transparent 60%);
+    }
+
+    .pizza-card.rank-worst::before {
+        background: linear-gradient(135deg, var(--worst-value-color) 0%, transparent 60%);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: calc(var(--spacing-unit) * 1.5);
+        position: relative;
+        z-index: 1;
+    }
+
+    .pizza-name {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+
+    /* Color-coded rank indicator on mobile */
+    .pizza-rank {
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.87);
+        transition: background-color 0.3s;
+    }
+
+    .pizza-rank.rank-1 {
+        background-color: var(--best-value-color);
+    }
+
+    .pizza-rank.rank-2 {
+        background-color: var(--good-value-color);
+    }
+
+    .pizza-rank.rank-3 {
+        background-color: var(--medium-value-color);
+    }
+
+    .pizza-rank.rank-4,
+    .pizza-rank.rank-5 {
+        background-color: var(--poor-value-color);
+    }
+
+    .pizza-rank.rank-worst {
+        background-color: var(--worst-value-color);
+    }
+
+    .pizza-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-unit);
+        position: relative;
+        z-index: 1;
+    }
+
+    .detail-row {
+        margin-bottom: var(--spacing-unit);
+    }
+
+    .detail-label {
+        color: var(--text-medium-emphasis);
+        font-size: 0.85rem;
+        margin-bottom: 3px;
+    }
+
+    .detail-value {
+        color: var(--text-high-emphasis);
+        font-size: 1rem;
+    }
+
+    .price-per-cm2 {
+        background-color: var(--surface-color-lighter);
+        padding: calc(var(--spacing-unit));
+        margin-top: calc(var(--spacing-unit) * 1.5);
+        border-radius: var(--border-radius-sm);
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .price-per-cm2 .detail-value {
+        color: var(--secondary-color);
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+}
