@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizza Price Ranker</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
 </head>
 <body>
     <div class="container">
         <h1>Pizza Price Ranker</h1>
-        <form id="pizzaForm" onsubmit="return false;">
+        <form id="pizzaForm">
             <div class="input-container">
                 <input type="text" id="name" placeholder="Name" aria-label="Name">
                 <input type="number" id="amount" placeholder="Amount" min="1" aria-label="Amount" class="no-spinner">
@@ -18,17 +20,15 @@
                 <input type="number" id="price" placeholder="Price per Pizza" min="0" step="0.01" aria-label="Price per Pizza" class="no-spinner">
             </div>
             <div class="button-container">
-                <button type="button" onclick="addPizza()">Add Pizza</button>
-                <button class="toggle-button" onclick="toggleRanking()">Toggle Ranking</button>
+                <button type="button" id="addPizzaBtn">Add Pizza</button>
+                <button type="button" class="toggle-button" id="toggleRankingBtn">Toggle Ranking</button>
             </div>
         </form>
 
-        <!-- Regular table view (shown on desktop) -->
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <!-- Changed: Removed sortable and onclick from rank column -->
                         <th scope="col" class="rank">
                             Rank
                         </th>
@@ -56,232 +56,86 @@
                             Price per cm²
                             <span class="sort-indicator"></span>
                         </th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="pizzaTable">
                 </tbody>
             </table>
 
-            <!-- Card view (shown on mobile) -->
             <div class="card-view" id="pizzaCards">
-                <!-- Cards will be generated here by JavaScript -->
             </div>
         </div>
     </div>
 
-    <script>
-        let pizzas = [];
-        let rankedPizzas = [];
-        let isRanked = false;
-        let sortColumn = 'pricePerCm2'; // Default sort by price per cm²
-        let sortOrder = 'asc'; // Default sort order
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Pizza</h2>
+                <button class="close-modal" onclick="closeModal('editModal')">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+            <form id="editForm" class="modal-form" onsubmit="return false;">
+                <input type="hidden" id="editIndex">
+                <div class="modal-input-group">
+                    <label for="editName">Name</label>
+                    <input type="text" id="editName" placeholder="Name" aria-label="Name">
+                </div>
+                <div class="modal-input-group">
+                    <label for="editAmount">Amount</label>
+                    <input type="number" id="editAmount" placeholder="Amount" min="1" aria-label="Amount" class="no-spinner">
+                </div>
+                <div class="modal-input-group">
+                    <label for="editDiameter">Diameter</label>
+                    <input type="number" id="editDiameter" placeholder="Diameter" min="1" aria-label="Diameter" class="no-spinner">
+                </div>
+                <div class="modal-input-group">
+                    <label for="editPrice">Price per Pizza</label>
+                    <input type="number" id="editPrice" placeholder="Price per Pizza" min="0" step="0.01" aria-label="Price per Pizza" class="no-spinner">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-save" onclick="savePizzaEdit()">Save Changes</button>
+                    <button type="button" class="btn-cancel" onclick="closeModal('editModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        function addPizza() {
-            const name = document.getElementById("name").value;
-            const amount = parseInt(document.getElementById("amount").value);
-            const diameter = parseFloat(document.getElementById("diameter").value);
-            const price = parseFloat(document.getElementById("price").value);
+    <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Delete Pizza</h2>
+                <button class="close-modal" onclick="closeModal('deleteConfirmModal')">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+            <div class="delete-message">
+                Are you sure you want to delete <span class="pizza-to-delete" id="pizzaToDeleteName"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-delete-confirm" id="confirmDeleteBtn">Delete</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('deleteConfirmModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-            if (!validateInputs(name, amount, diameter, price)) {
-                alert("Please enter valid values.");
-                return;
-            }
-
-            const pizza = calculatePizza(name, amount, diameter, price);
-            pizzas.push(pizza);
-            calculateRanks();
-            updateTable();
-            updateCards();
-            updateSortIndicators();
-
-            // Clear input fields
-            document.getElementById("name").value = "";
-            document.getElementById("amount").value = "";
-            document.getElementById("diameter").value = "";
-            document.getElementById("price").value = "";
-        }
-
-        function validateInputs(name, amount, diameter, price) {
-            return name.trim() !== "" && !isNaN(amount) && !isNaN(diameter) && !isNaN(price) && amount > 0 && diameter > 0 && price >= 0;
-        }
-
-        function calculatePizza(name, amount, diameter, price) {
-            const radius = diameter / 2;
-            const area = Math.PI * Math.pow(radius, 2) * amount;
-            const pricePerCm2 = price * amount / area;
-            const totalPrice = price * amount;
-            return { name, amount, diameter, price, pricePerCm2, totalPrice };
-        }
-
-        function calculateRanks() {
-            // Always sort by pricePerCm2 for ranking, regardless of display sort
-            const sortedByValue = [...pizzas].sort((a, b) => a.pricePerCm2 - b.pricePerCm2);
-            sortedByValue.forEach((pizza, index) => pizza.valueRank = index + 1);
-
-            // Sort by the selected column for display
-            rankedPizzas = [...pizzas].sort((a, b) => {
-                if (a[sortColumn] < b[sortColumn]) return sortOrder === 'asc' ? -1 : 1;
-                if (a[sortColumn] > b[sortColumn]) return sortOrder === 'asc' ? 1 : -1;
-                return 0;
-            });
-
-            // Assign display ranks
-            rankedPizzas.forEach((pizza, index) => pizza.rank = index + 1);
-        }
-
-        function toggleRanking() {
-            isRanked = !isRanked;
-            updateTable();
-            updateCards();
-        }
-
-        function sortTable(column) {
-            // Changed: Added check to prevent sorting by rank
-            if (column === 'rank') {
-                return;
-            }
-
-            if (sortColumn === column) {
-                sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortColumn = column;
-                sortOrder = 'asc';
-            }
-            calculateRanks();
-            updateTable();
-            updateCards();
-            updateSortIndicators();
-        }
-
-        // Update the sort indicators in the table headers
-        function updateSortIndicators() {
-            // Remove all sorting classes
-            const headers = document.querySelectorAll('th.sortable');
-            headers.forEach(header => {
-                header.classList.remove('sort-active', 'sort-asc', 'sort-desc');
-            });
-
-            // Add sorting class to the active column
-            const activeHeader = document.getElementById(`sort-${sortColumn}`);
-            if (activeHeader) {
-                activeHeader.classList.add('sort-active');
-                activeHeader.classList.add(sortOrder === 'asc' ? 'sort-asc' : 'sort-desc');
-            }
-        }
-
-        // Get CSS class for rank-based color coding
-        function getRankColorClass(valueRank) {
-            if (valueRank === 1) return 'rank-1';
-            if (valueRank === 2) return 'rank-2';
-            if (valueRank === 3) return 'rank-3';
-            if (valueRank === 4) return 'rank-4';
-            if (valueRank === 5) return 'rank-5';
-            return 'rank-worst';
-        }
-
-        function updateTable() {
-            const tableBody = document.getElementById("pizzaTable");
-            tableBody.innerHTML = "";
-
-            const displayList = isRanked ? rankedPizzas : pizzas;
-            displayList.forEach(pizza => {
-                const row = document.createElement('tr');
-
-                // Add color coding to the rank cell - ensure worst rank gets proper class
-                const rankCell = document.createElement('td');
-                rankCell.textContent = pizza.rank || '-';
-
-                // Use the correct class based on value rank
-                if (pizza.valueRank > 5) {
-                    rankCell.className = 'rank-value-worst';
-                } else {
-                    rankCell.className = `rank-value-${pizza.valueRank}`;
-                }
-
-                row.appendChild(rankCell);
-
-                // Add remaining cells
-                row.innerHTML += `
-                    <td>${pizza.name}</td>
-                    <td>${pizza.amount}</td>
-                    <td>${pizza.diameter}</td>
-                    <td>${pizza.price.toFixed(2)}</td>
-                    <td>${pizza.totalPrice.toFixed(2)}</td>
-                    <td>${pizza.pricePerCm2.toFixed(4)}</td>
-                `;
-
-                tableBody.appendChild(row);
-            });
-        }
-
-        // Update cards for mobile view
-        function updateCards() {
-            const cardsContainer = document.getElementById("pizzaCards");
-            cardsContainer.innerHTML = "";
-
-            const displayList = isRanked ? rankedPizzas : pizzas;
-
-            displayList.forEach(pizza => {
-                const card = document.createElement('div');
-
-                // Use correct rank class for card
-                let rankClass;
-                if (pizza.valueRank > 5) {
-                    rankClass = 'rank-worst';
-                } else {
-                    rankClass = `rank-${pizza.valueRank}`;
-                }
-
-                card.className = `pizza-card ${rankClass}`;
-
-                card.innerHTML = `
-                    <div class="card-header">
-                        <div class="pizza-name">${pizza.name}</div>
-                        <div class="pizza-rank ${rankClass}">${pizza.rank || '-'}</div>
-                    </div>
-                    <div class="pizza-details">
-                        <div class="detail-row">
-                            <div class="detail-label">Amount</div>
-                            <div class="detail-value">${pizza.amount}</div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-label">Diameter</div>
-                            <div class="detail-value">${pizza.diameter}</div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-label">Price</div>
-                            <div class="detail-value">${pizza.price.toFixed(2)}</div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-label">Total</div>
-                            <div class="detail-value">${pizza.totalPrice.toFixed(2)}</div>
-                        </div>
-                    </div>
-                    <div class="price-per-cm2">
-                        <div class="detail-label">Price per cm²</div>
-                        <div class="detail-value">${pizza.pricePerCm2.toFixed(4)}</div>
-                    </div>
-                `;
-
-                cardsContainer.appendChild(card);
-            });
-        }
-
-        // Initialize the app
-        window.addEventListener('load', function() {
-            // Initialize sort indicators
-            updateSortIndicators();
-
-            // Add initial example pizza data if needed
-            if (pizzas.length === 0) {
-                // Add example data for testing (optional)
-                // const examplePizza = calculatePizza("Example Pizza", 1, 30, 10);
-                // pizzas.push(examplePizza);
-                // calculateRanks();
-                // updateTable();
-                // updateCards();
-            }
-        });
-    </script>
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Invalid Input</h2>
+                <button class="close-modal" onclick="closeModal('infoModal')">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+            <div class="info-message">
+                <i class="material-icons info-icon">error_outline</i>
+                <p id="infoMessage">Please enter valid values.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-primary" onclick="closeModal('infoModal')">OK</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -1,49 +1,44 @@
-/* Enhanced Material Design Dark Theme for Pizza Price Ranker */
 :root {
-    /* Base Theme Colors */
     --background-color: #121212;
     --surface-color: #1e1e1e;
     --surface-color-lighter: #2d2d2d;
-    --primary-color: #BB86FC; /* Purple-ish accent color */
+    --primary-color: #BB86FC;
     --primary-color-variant: #3700B3;
-    --secondary-color: #03DAC6; /* Teal accent color - Cyan */
+    --secondary-color: #03DAC6;
     --error-color: #CF6679;
+    --info-color: #2196F3;
 
-    /* Text colors */
-    --text-high-emphasis: rgba(255, 255, 255, 0.87); /* Primary text */
-    --text-medium-emphasis: rgba(255, 255, 255, 0.6); /* Secondary text */
-    --text-disabled: rgba(255, 255, 255, 0.38); /* Disabled text */
+    --text-high-emphasis: rgba(255, 255, 255, 0.87);
+    --text-medium-emphasis: rgba(255, 255, 255, 0.6);
+    --text-disabled: rgba(255, 255, 255, 0.38);
 
-    /* Interactive element colors */
     --ripple-color: rgba(255, 255, 255, 0.1);
     --hover-color: rgba(255, 255, 255, 0.05);
     --focus-color: rgba(255, 255, 255, 0.12);
 
-    /* Shadows */
     --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     --shadow-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 
-    /* Spacing */
     --spacing-unit: 8px;
 
-    /* Border radius */
     --border-radius-sm: 4px;
     --border-radius-md: 8px;
     --border-radius-lg: 16px;
 
-    /* Color grading for pizzas */
-    --best-value-color: #4CAF50; /* Green for best value */
-    --good-value-color: #8BC34A; /* Light green for good value */
-    --medium-value-color: #FFEB3B; /* Yellow for medium value */
-    --poor-value-color: #FF9800; /* Orange for poor value */
-    --worst-value-color: #F44336; /* Red for worst value */
+    --best-value-color: #4CAF50;
+    --good-value-color: #8BC34A;
+    --medium-value-color: #FFEB3B;
+    --poor-value-color: #FF9800;
+    --worst-value-color: #F44336;
 
-    /* Sort indicators - Changed to cyan */
-    --sort-asc-color: #03DAC6; /* Cyan for sort indicators */
-    --sort-desc-color: #03DAC6; /* Cyan for sort indicators */
+    --sort-asc-color: #03DAC6;
+    --sort-desc-color: #03DAC6;
+
+    --edit-color: #BB86FC;
+    --delete-color: #03DAC6;
+    --swipe-threshold: 100px;
 }
 
-/* Reset and base styles */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -76,20 +71,17 @@ h1 {
     text-align: center;
 }
 
-/* Form styles */
 #pizzaForm {
     background-color: var(--surface-color);
     padding: calc(var(--spacing-unit) * 2);
     border-radius: var(--border-radius-md);
     margin-bottom: calc(var(--spacing-unit) * 3);
     box-shadow: var(--shadow-1);
-    /* Center form contents */
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* Input field container */
 .input-container {
     display: flex;
     flex-wrap: wrap;
@@ -108,7 +100,6 @@ input {
     width: calc(100% - var(--spacing-unit) * 2);
     max-width: 300px;
     transition: border-color 0.2s, box-shadow 0.2s;
-    /* Center inputs by displaying as block and using auto margins */
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -124,21 +115,17 @@ input::placeholder {
     color: var(--text-medium-emphasis);
 }
 
-/* Remove spinner buttons from number inputs - comprehensive approach */
-/* For Chrome, Safari, Edge, Opera */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-/* For Firefox */
 input[type="number"] {
     -moz-appearance: textfield;
     appearance: textfield;
 }
 
-/* Additional class for more specific targeting */
 .no-spinner {
     -moz-appearance: textfield;
     appearance: textfield;
@@ -177,7 +164,7 @@ button {
 }
 
 button:hover {
-    background-color: #CBB2FC; /* Lighter variant of primary */
+    background-color: #CBB2FC;
     box-shadow: var(--shadow-2);
 }
 
@@ -190,10 +177,9 @@ button:active {
 }
 
 .toggle-button:hover {
-    background-color: #66e9db; /* Lighter variant of secondary */
+    background-color: #66e9db;
 }
 
-/* Regular table for desktop */
 .table-container {
     width: 100%;
     overflow-x: hidden;
@@ -212,7 +198,6 @@ thead {
     background-color: var(--surface-color-lighter);
 }
 
-/* Updated table header styles with improved sort indicators */
 th {
     background-color: var(--surface-color-lighter);
     color: var(--primary-color);
@@ -226,10 +211,10 @@ th {
     letter-spacing: 1px;
 }
 
-/* Style for non-sortable rank header */
 th.rank {
     cursor: default;
     padding-right: calc(var(--spacing-unit) * 1.5);
+    text-align: center;
 }
 
 th.sortable {
@@ -238,12 +223,10 @@ th.sortable {
     user-select: none;
 }
 
-/* Remove the default sort indicators */
 th.sortable::after {
     content: "";
 }
 
-/* Enhanced sort indicators with thicker arrows in cyan color */
 th.sortable .sort-indicator {
     position: absolute;
     right: var(--spacing-unit);
@@ -258,14 +241,12 @@ th.sortable .sort-indicator {
     justify-content: center;
 }
 
-/* Show the active sort indicator */
 th.sort-active .sort-indicator {
     opacity: 1;
 }
 
-/* Different icons and colors for ascending and descending - thicker triangles in cyan */
 th.sort-asc .sort-indicator::after {
-    content: "▲"; /* Triangle up - thicker */
+    content: "▲";
     color: var(--sort-asc-color);
     font-size: 14px;
     font-weight: bold;
@@ -273,7 +254,7 @@ th.sort-asc .sort-indicator::after {
 }
 
 th.sort-desc .sort-indicator::after {
-    content: "▼"; /* Triangle down - thicker */
+    content: "▼";
     color: var(--sort-desc-color);
     font-size: 14px;
     font-weight: bold;
@@ -285,6 +266,14 @@ td {
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     color: var(--text-high-emphasis);
     text-align: left;
+    position: relative;
+    z-index: 1;
+}
+
+
+td:first-child {
+    text-align: center;
+    font-weight: 500;
 }
 
 tbody tr {
@@ -300,18 +289,17 @@ tbody tr:last-child td {
     border-bottom: none;
 }
 
-/* Updated value-based color coding for rank on desktop - matching mobile gradient direction */
 .rank-value-1 {
     position: relative;
 }
-.rank-value-1::before {
+.rank-value-1::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--best-value-color) 0%, transparent 70%);
+    background: linear-gradient(135deg, var(--best-value-color) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
 }
@@ -319,14 +307,14 @@ tbody tr:last-child td {
 .rank-value-2 {
     position: relative;
 }
-.rank-value-2::before {
+.rank-value-2::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--good-value-color) 0%, transparent 70%);
+    background: linear-gradient(135deg, var(--good-value-color) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
 }
@@ -334,14 +322,14 @@ tbody tr:last-child td {
 .rank-value-3 {
     position: relative;
 }
-.rank-value-3::before {
+.rank-value-3::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--medium-value-color) 0%, transparent 70%);
+    background: linear-gradient(135deg, var(--medium-value-color) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
 }
@@ -350,15 +338,15 @@ tbody tr:last-child td {
 .rank-value-5 {
     position: relative;
 }
-.rank-value-4::before,
-.rank-value-5::before {
+.rank-value-4::after,
+.rank-value-5::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--poor-value-color) 0%, transparent 70%);
+    background: linear-gradient(135deg, var(--poor-value-color) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
 }
@@ -373,12 +361,11 @@ tbody tr:last-child td {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--worst-value-color) 0%, transparent 70%);
+    background: linear-gradient(135deg, var(--worst-value-color) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
 }
 
-/* Make sure the text stays on top of the gradient */
 .rank-value-1,
 .rank-value-2,
 .rank-value-3,
@@ -398,12 +385,243 @@ tbody tr:last-child td {
     z-index: 1;
 }
 
-/* Card layout for mobile */
 .card-view {
     display: none;
 }
 
-/* Mobile-friendly styles */
+.action-buttons {
+    display: flex;
+    gap: var(--spacing-unit);
+}
+
+.btn-edit, .btn-delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: calc(var(--spacing-unit) * 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: unset;
+    width: 36px;
+    height: 36px;
+    box-shadow: none;
+    transition: background-color 0.2s;
+}
+
+.btn-edit {
+    color: var(--edit-color);
+}
+
+.btn-delete {
+    color: var(--delete-color);
+}
+
+.btn-edit:hover {
+    background-color: rgba(187, 134, 252, 0.1);
+}
+
+.btn-delete:hover {
+    background-color: rgba(3, 218, 198, 0.1);
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--surface-color);
+    padding: calc(var(--spacing-unit) * 3);
+    border-radius: var(--border-radius-md);
+    max-width: 500px;
+    width: 90%;
+    box-shadow: var(--shadow-2);
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: calc(var(--spacing-unit) * 2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
+.modal-title {
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 1.5rem;
+    text-align: left;
+}
+
+.close-modal {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    background-color: var(--surface-color-lighter);
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-medium-emphasis);
+    min-width: unset;
+    box-shadow: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    transition: background-color 0.2s, color 0.2s;
+    z-index: 10;
+}
+
+.close-modal .material-icons {
+    font-size: 20px;
+}
+
+.close-modal:hover {
+    background-color: var(--hover-color);
+    color: var(--text-high-emphasis);
+    box-shadow: none;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-unit);
+}
+
+
+.modal-form input {
+    background-color: var(--surface-color-lighter);
+    color: var(--text-high-emphasis);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--border-radius-sm);
+    padding: calc(var(--spacing-unit) * 1.5);
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modal-form input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.3);
+}
+
+.modal-form label {
+    color: var(--text-high-emphasis);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: calc(var(--spacing-unit) * 0.5);
+    display: block;
+    text-align: center;
+}
+
+.modal-input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--spacing-unit);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: calc(var(--spacing-unit) * 2);
+    gap: var(--spacing-unit);
+}
+
+.modal-footer button {
+    min-width: 120px;
+}
+
+.btn-save {
+    background-color: var(--primary-color);
+}
+
+.btn-delete-confirm {
+    background-color: var(--error-color);
+}
+
+.btn-delete-confirm:hover {
+    background-color: #e57373;
+}
+
+.btn-cancel {
+    background-color: transparent;
+    color: var(--text-medium-emphasis);
+    border: 1px solid var(--text-medium-emphasis);
+}
+
+.btn-cancel:hover {
+    background-color: var(--hover-color);
+    color: var(--text-high-emphasis);
+}
+
+.delete-message {
+    color: var(--text-high-emphasis);
+    text-align: center;
+    margin: calc(var(--spacing-unit) * 2) 0;
+    font-size: 1.1rem;
+}
+
+
+#deleteConfirmModal .modal-content {
+    max-width: 400px;
+}
+
+#deleteConfirmModal .modal-footer {
+    justify-content: center;
+}
+
+.pizza-to-delete {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.info-message {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    margin: calc(var(--spacing-unit) * 2) 0;
+    padding: calc(var(--spacing-unit) * 1.5);
+    background-color: rgba(33, 150, 243, 0.1);
+    border-left: 4px solid var(--secondary-color);
+    border-radius: var(--border-radius-sm);
+}
+
+.info-icon {
+    color: var(--secondary-color);
+    font-size: 24px;
+    margin-right: calc(var(--spacing-unit) * 1.5);
+}
+
+#infoMessage {
+    color: var(--text-high-emphasis);
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #000000;
+}
+
+.btn-primary:hover {
+    background-color: #CBB2FC;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: var(--spacing-unit);
@@ -414,7 +632,6 @@ tbody tr:last-child td {
         margin-bottom: calc(var(--spacing-unit) * 2);
     }
 
-    /* Mobile inputs */
     input, button {
         width: 100%;
         max-width: 100%;
@@ -430,12 +647,10 @@ tbody tr:last-child td {
         width: 100%;
     }
 
-    /* Hide regular table on mobile */
     .table-container table {
         display: none;
     }
 
-    /* Show card view on mobile */
     .card-view {
         display: block;
         margin-top: var(--spacing-unit);
@@ -448,10 +663,82 @@ tbody tr:last-child td {
         padding: calc(var(--spacing-unit) * 2);
         box-shadow: var(--shadow-1);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
+        transform: translateX(0);
+        transition: transform 0.3s ease;
+        touch-action: pan-y;
+        user-select: none;
     }
 
-    /* Color gradient based on value ranking */
+    .pizza-card.swiping {
+        transition: none;
+    }
+
+
+    .swipe-indicator {
+        display: none;
+    }
+
+    .swipe-actions {
+        display: none;
+    }
+
+
+    .swipe-action-visible {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 10;
+    }
+
+    .edit-icon-visible {
+        background-color: var(--edit-color);
+        left: -70px;
+        color: #000000;
+    }
+
+    .delete-icon-visible {
+        background-color: var(--delete-color);
+        right: -70px;
+        color: #000000;
+    }
+
+    .swipe-icon-edit,
+    .swipe-icon-delete {
+        font-size: 24px;
+    }
+
+
+    .swipe-left-active .edit-icon-visible {
+        opacity: 1;
+        left: -70px;
+    }
+
+    .swipe-right-active .delete-icon-visible {
+        opacity: 1;
+        right: -70px;
+    }
+
+    .pizza-card.swipe-left-active {
+        background: linear-gradient(to right,
+        color-mix(in srgb, var(--edit-color) 30%, transparent),
+        color-mix(in srgb, var(--edit-color) 5%, transparent) 90%);
+    }
+
+    .pizza-card.swipe-right-active {
+        background: linear-gradient(to left,
+        color-mix(in srgb, var(--delete-color) 30%, transparent),
+        color-mix(in srgb, var(--delete-color) 5%, transparent) 90%);
+    }
+
     .pizza-card::before {
         content: '';
         position: absolute;
@@ -464,26 +751,25 @@ tbody tr:last-child td {
         pointer-events: none;
     }
 
-    /* Different gradients based on pizza rank */
     .pizza-card.rank-1::before {
-        background: linear-gradient(135deg, var(--best-value-color) 0%, transparent 60%);
+        background: linear-gradient(135deg, var(--best-value-color) 0%, transparent 50%);
     }
 
     .pizza-card.rank-2::before {
-        background: linear-gradient(135deg, var(--good-value-color) 0%, transparent 60%);
+        background: linear-gradient(135deg, var(--good-value-color) 0%, transparent 50%);
     }
 
     .pizza-card.rank-3::before {
-        background: linear-gradient(135deg, var(--medium-value-color) 0%, transparent 60%);
+        background: linear-gradient(135deg, var(--medium-value-color) 0%, transparent 50%);
     }
 
     .pizza-card.rank-4::before,
     .pizza-card.rank-5::before {
-        background: linear-gradient(135deg, var(--poor-value-color) 0%, transparent 60%);
+        background: linear-gradient(135deg, var(--poor-value-color) 0%, transparent 50%);
     }
 
     .pizza-card.rank-worst::before {
-        background: linear-gradient(135deg, var(--worst-value-color) 0%, transparent 60%);
+        background: linear-gradient(135deg, var(--worst-value-color) 0%, transparent 50%);
     }
 
     .card-header {
@@ -501,44 +787,52 @@ tbody tr:last-child td {
         font-weight: 500;
     }
 
-    /* Color-coded rank indicator on mobile */
     .pizza-rank {
         border-radius: 50%;
-        width: 30px;
-        height: 30px;
+        width: 36px;
+        height: 36px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: bold;
-        color: rgba(0, 0, 0, 0.87);
+        background-color: var(--surface-color-lighter);
+        color: var(--text-high-emphasis);
         transition: background-color 0.3s;
+        position: relative;
+        z-index: 3;
+        text-align: center;
     }
 
-    .pizza-rank.rank-1 {
+    .pizza-card.rank-1 .pizza-rank {
         background-color: var(--best-value-color);
+        color: rgba(0, 0, 0, 0.87);
     }
 
-    .pizza-rank.rank-2 {
+    .pizza-card.rank-2 .pizza-rank {
         background-color: var(--good-value-color);
+        color: rgba(0, 0, 0, 0.87);
     }
 
-    .pizza-rank.rank-3 {
+    .pizza-card.rank-3 .pizza-rank {
         background-color: var(--medium-value-color);
+        color: rgba(0, 0, 0, 0.87);
     }
 
-    .pizza-rank.rank-4,
-    .pizza-rank.rank-5 {
+    .pizza-card.rank-4 .pizza-rank,
+    .pizza-card.rank-5 .pizza-rank {
         background-color: var(--poor-value-color);
+        color: rgba(0, 0, 0, 0.87);
     }
 
-    .pizza-rank.rank-worst {
+    .pizza-card.rank-worst .pizza-rank {
         background-color: var(--worst-value-color);
+        color: rgba(255, 255, 255, 0.87);
     }
 
     .pizza-details {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: var(--spacing-unit);
+        gap: calc(var(--spacing-unit));
         position: relative;
         z-index: 1;
     }
@@ -573,4 +867,35 @@ tbody tr:last-child td {
         font-weight: 700;
         font-size: 1.1rem;
     }
+
+    .modal-content {
+        width: 95%;
+        padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 2);
+    }
+
+    .modal-header {
+        margin-bottom: calc(var(--spacing-unit) * 1.5);
+    }
+
+    .close-modal {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .modal-title {
+        text-align: left;
+        margin: 0;
+    }
+    
+    .info-message {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .info-icon {
+        margin-right: 0;
+        margin-bottom: var(--spacing-unit);
+        font-size: 36px;
+    }
 }
+
