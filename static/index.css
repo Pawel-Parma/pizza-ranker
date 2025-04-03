@@ -6,7 +6,6 @@
     --primary-color-variant: #3700B3;
     --secondary-color: #03DAC6;
     --error-color: #CF6679;
-    --info-color: #2196F3;
 
     --text-high-emphasis: rgba(255, 255, 255, 0.87);
     --text-medium-emphasis: rgba(255, 255, 255, 0.6);
@@ -576,6 +575,10 @@ tbody tr:last-child td {
     font-size: 1.1rem;
 }
 
+.pizza-to-delete {
+    font-weight: bold;
+    color: var(--secondary-color);
+}
 
 #deleteConfirmModal .modal-content {
     max-width: 400px;
@@ -587,7 +590,7 @@ tbody tr:last-child td {
 
 .pizza-to-delete {
     font-weight: bold;
-    color: var(--primary-color);
+    color: var(--secondary-color);
 }
 
 .info-message {

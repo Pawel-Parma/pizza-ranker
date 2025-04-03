@@ -436,12 +436,10 @@ window.onclick = function(event) {
         closeModal('editModal');
         resetAllCards();
     }
-    if (event.target === document.getElementById('deleteConfirmModal')) {
-        closeModal('deleteConfirmModal');
-        resetAllCards();
-    }
+    // Remove the delete modal background click handler to prevent it from closing
     if (event.target === document.getElementById('infoModal')) {
         closeModal('infoModal');
         resetAllCards();
     }
 }
+
