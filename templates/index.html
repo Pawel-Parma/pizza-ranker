@@ -21,7 +21,16 @@
             </div>
             <div class="button-container">
                 <button type="button" id="addPizzaBtn">Add Pizza</button>
-                <button type="button" class="toggle-button" id="toggleRankingBtn">Toggle Ranking</button>
+                <button type="button" class="share-button" id="shareBtn">
+                    <span class="share-button-content">
+                        <i class="material-icons share-icon">share</i>
+                        <span class="button-text">Share</span>
+                    </span>
+                    <span class="share-button-success">
+                        <i class="material-icons success-icon">check_circle</i>
+                        <span class="success-text">Copied</span>
+                    </span>
+                </button>
             </div>
         </form>
 
@@ -32,7 +41,7 @@
                         <th scope="col" class="rank">
                             Rank
                         </th>
-                        <th scope="col" class="sortable" id="sort-name" onclick="sortTable('name')">
+                        <th scope="col" id="sort-name">
                             Name
                             <span class="sort-indicator"></span>
                         </th>

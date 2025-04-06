@@ -6,6 +6,8 @@
     --primary-color-variant: #3700B3;
     --secondary-color: #03DAC6;
     --error-color: #CF6679;
+    --share-color: #03DAC6;
+    --share-success-color: #03DAC6;
 
     --text-high-emphasis: rgba(255, 255, 255, 0.87);
     --text-medium-emphasis: rgba(255, 255, 255, 0.6);
@@ -288,9 +290,17 @@ tbody tr:last-child td {
     border-bottom: none;
 }
 
-.rank-value-1 {
+/* Remove the gradient pseudo-elements for table rows */
+.rank-value-1,
+.rank-value-2,
+.rank-value-3,
+.rank-value-4,
+.rank-value-5,
+.rank-value-6 {
     position: relative;
 }
+
+/* Change the gradient effects to only apply to the rank cell, not the whole row */
 .rank-value-1::after {
     content: '';
     position: absolute;
@@ -298,14 +308,12 @@ tbody tr:last-child td {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--best-value-color) 0%, transparent 50%);
+    background-color: var(--best-value-color);
+    opacity: 0.2;
     pointer-events: none;
     z-index: 0;
 }
 
-.rank-value-2 {
-    position: relative;
-}
 .rank-value-2::after {
     content: '';
     position: absolute;
@@ -313,14 +321,12 @@ tbody tr:last-child td {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--good-value-color) 0%, transparent 50%);
+    background-color: var(--good-value-color);
+    opacity: 0.2;
     pointer-events: none;
     z-index: 0;
 }
 
-.rank-value-3 {
-    position: relative;
-}
 .rank-value-3::after {
     content: '';
     position: absolute;
@@ -328,15 +334,12 @@ tbody tr:last-child td {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--medium-value-color) 0%, transparent 50%);
+    background-color: var(--medium-value-color);
+    opacity: 0.2;
     pointer-events: none;
     z-index: 0;
 }
 
-.rank-value-4,
-.rank-value-5 {
-    position: relative;
-}
 .rank-value-4::after,
 .rank-value-5::after {
     content: '';
@@ -345,22 +348,21 @@ tbody tr:last-child td {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--poor-value-color) 0%, transparent 50%);
+    background-color: var(--poor-value-color);
+    opacity: 0.2;
     pointer-events: none;
     z-index: 0;
 }
 
-.rank-value-worst {
-    position: relative;
-}
-.rank-value-worst::before {
+.rank-value-6::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--worst-value-color) 0%, transparent 50%);
+    background-color: var(--worst-value-color);
+    opacity: 0.2;
     pointer-events: none;
     z-index: 0;
 }
@@ -370,7 +372,7 @@ tbody tr:last-child td {
 .rank-value-3,
 .rank-value-4,
 .rank-value-5,
-.rank-value-worst {
+.rank-value-6 {
     position: relative;
 }
 
@@ -379,7 +381,7 @@ tbody tr:last-child td {
 .rank-value-3 *,
 .rank-value-4 *,
 .rank-value-5 *,
-.rank-value-worst * {
+.rank-value-6 * {
     position: relative;
     z-index: 1;
 }
@@ -437,6 +439,17 @@ tbody tr:last-child td {
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal[style*="display: flex"] {
+    animation: modalFadeIn 0.3s forwards;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .modal-content {
@@ -447,6 +460,20 @@ tbody tr:last-child td {
     width: 90%;
     box-shadow: var(--shadow-2);
     position: relative;
+    transform: translateY(10px);
+    opacity: 0;
+    animation: modalSlideUp 0.3s 0.1s ease-out forwards;
+}
+
+@keyframes modalSlideUp {
+    from { 
+        transform: translateY(10px); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
 }
 
 .modal-header {
@@ -625,6 +652,231 @@ tbody tr:last-child td {
     background-color: #CBB2FC;
 }
 
+.share-button {
+    background-color: var(--secondary-color);
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s, transform 0.2s;
+    min-height: 44px;
+    height: auto;
+}
+
+.share-button:hover {
+    background-color: color-mix(in srgb, var(--secondary-color) 80%, white);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.share-button:active {
+    transform: translateY(0);
+}
+
+.share-button-content,
+.share-button-success {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+
+.share-button-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.share-button-success {
+    background-color: var(--share-success-color);
+    transform: translateY(100%);
+    opacity: 0;
+    border-radius: var(--border-radius-sm);
+}
+
+.share-button.copied .share-button-content {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.share-button.copied .share-button-success {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.share-button .material-icons.share-icon {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.share-button .material-icons.success-icon {
+    font-size: 18px;
+    transform: scale(0);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.share-button.copied .material-icons.success-icon {
+    transform: scale(1.2) rotate(360deg);
+    animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1.2); }
+}
+
+.share-button[data-animating="returning"] .share-button-content {
+    animation: slideInFromTop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.share-button[data-animating="returning"] .share-button-success {
+    animation: slideOutToBottom 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+}
+
+@keyframes slideInFromTop {
+    0% { transform: translateY(-100%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideOutToBottom {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(100%); opacity: 0; }
+}
+
+.share-content {
+    margin: calc(var(--spacing-unit) * 2) 0;
+}
+
+.share-content p {
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
+    color: var(--text-high-emphasis);
+    text-align: center;
+}
+
+.share-link-container {
+    display: flex;
+    gap: var(--spacing-unit);
+    margin-top: calc(var(--spacing-unit) * 2);
+}
+
+.share-link-container input {
+    flex: 1;
+    padding: calc(var(--spacing-unit) * 1.5);
+    background-color: var(--surface-color-lighter);
+    color: var(--text-high-emphasis);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.9rem;
+}
+
+.btn-copy {
+    background-color: var(--secondary-color);
+    color: #000000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+.btn-copy:hover {
+    background-color: color-mix(in srgb, var(--secondary-color) 80%, white);
+}
+
+.btn-copy .material-icons {
+    font-size: 18px;
+}
+
+.btn-copy .copy-icon {
+    transition: opacity 0.3s ease;
+}
+
+.btn-copy .success-icon {
+    position: absolute;
+    left: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: scale(0);
+}
+
+.btn-copy.copied {
+    background-color: var(--share-success-color);
+}
+
+.btn-copy.copied .copy-icon {
+    opacity: 0;
+}
+
+.btn-copy.copied .success-icon {
+    opacity: 1;
+    transform: scale(1) rotate(360deg);
+}
+
+.swipe-action-visible {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 10;
+}
+
+.edit-icon-visible {
+    background-color: var(--edit-color);
+    left: -70px;
+    color: #000000;
+}
+
+.delete-icon-visible {
+    background-color: var(--delete-color);
+    right: -70px;
+    color: #000000;
+}
+
+.swipe-icon-edit,
+.swipe-icon-delete {
+    font-size: 24px;
+}
+
+.swipe-left-active .edit-icon-visible {
+    opacity: 1;
+    left: -70px;
+}
+
+.swipe-right-active .delete-icon-visible {
+    opacity: 1;
+    right: -70px;
+}
+
+.pizza-card.swipe-left-active {
+    background: linear-gradient(to right,
+    color-mix(in srgb, var(--edit-color) 40%, transparent),
+    color-mix(in srgb, var(--edit-color) 5%, transparent) 90%);
+    box-shadow: -2px 0 8px rgba(187, 134, 252, 0.2);
+}
+
+.pizza-card.swipe-right-active {
+    background: linear-gradient(to left,
+    color-mix(in srgb, var(--delete-color) 40%, transparent),
+    color-mix(in srgb, var(--delete-color) 5%, transparent) 90%);
+    box-shadow: 2px 0 8px rgba(3, 218, 198, 0.2);
+}
+
 @media (max-width: 768px) {
     .container {
         padding: var(--spacing-unit);
@@ -690,7 +942,7 @@ tbody tr:last-child td {
     .swipe-action-visible {
         position: absolute;
         top: 50%;
-        transform: translateY(-50%);
+        transform: translateY(-50%) scale(0.8);
         width: 60px;
         height: 60px;
         border-radius: 50%;
@@ -698,7 +950,7 @@ tbody tr:last-child td {
         align-items: center;
         justify-content: center;
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         z-index: 10;
     }
 
@@ -717,29 +969,51 @@ tbody tr:last-child td {
     .swipe-icon-edit,
     .swipe-icon-delete {
         font-size: 24px;
+        transition: transform 0.3s ease;
     }
-
 
     .swipe-left-active .edit-icon-visible {
         opacity: 1;
         left: -70px;
+        transform: translateY(-50%) scale(1);
+        animation: pulseIcon 1s infinite alternate;
     }
 
     .swipe-right-active .delete-icon-visible {
         opacity: 1;
         right: -70px;
+        transform: translateY(-50%) scale(1);
+        animation: pulseIcon 1s infinite alternate;
+    }
+
+    @keyframes pulseIcon {
+        0% { transform: translateY(-50%) scale(1); }
+        100% { transform: translateY(-50%) scale(1.1); }
+    }
+
+    .swipe-left-active .swipe-icon-edit,
+    .swipe-right-active .swipe-icon-delete {
+        animation: wiggle 1s ease infinite;
+    }
+
+    @keyframes wiggle {
+        0%, 100% { transform: rotate(0); }
+        25% { transform: rotate(-15deg); }
+        75% { transform: rotate(15deg); }
     }
 
     .pizza-card.swipe-left-active {
         background: linear-gradient(to right,
-        color-mix(in srgb, var(--edit-color) 30%, transparent),
+        color-mix(in srgb, var(--edit-color) 40%, transparent),
         color-mix(in srgb, var(--edit-color) 5%, transparent) 90%);
+        box-shadow: -5px 0 15px rgba(187, 134, 252, 0.3);
     }
 
     .pizza-card.swipe-right-active {
         background: linear-gradient(to left,
-        color-mix(in srgb, var(--delete-color) 30%, transparent),
+        color-mix(in srgb, var(--delete-color) 40%, transparent),
         color-mix(in srgb, var(--delete-color) 5%, transparent) 90%);
+        box-shadow: 5px 0 15px rgba(3, 218, 198, 0.3);
     }
 
     .pizza-card::before {
@@ -771,7 +1045,7 @@ tbody tr:last-child td {
         background: linear-gradient(135deg, var(--poor-value-color) 0%, transparent 50%);
     }
 
-    .pizza-card.rank-worst::before {
+    .pizza-card.rank-6::before {
         background: linear-gradient(135deg, var(--worst-value-color) 0%, transparent 50%);
     }
 
@@ -827,7 +1101,7 @@ tbody tr:last-child td {
         color: rgba(0, 0, 0, 0.87);
     }
 
-    .pizza-card.rank-worst .pizza-rank {
+    .pizza-card.rank-6 .pizza-rank {
         background-color: var(--worst-value-color);
         color: rgba(255, 255, 255, 0.87);
     }
@@ -899,6 +1173,23 @@ tbody tr:last-child td {
         margin-right: 0;
         margin-bottom: var(--spacing-unit);
         font-size: 36px;
+    }
+
+    .share-link-container {
+        flex-direction: column;
+    }
+    
+    .share-link-container input {
+        margin-bottom: var(--spacing-unit);
+    }
+    
+    .btn-copy {
+        width: 100%;
+    }
+    
+    .share-button {
+        width: 100%;
+        margin-top: var(--spacing-unit);
     }
 }
 

@@ -1,17 +1,112 @@
 let pizzas = [];
 let rankedPizzas = [];
-let isRanked = false;
 let sortColumn = 'pricePerCm2';
 let sortOrder = 'asc';
 let editingIndex = -1;
 let deletingIndex = -1;
 
-// Touch handling variables
+
 let startX = 0;
 let currentX = 0;
 let isSwiping = false;
-let swipeThreshold = 100; // Minimum swipe distance to trigger action
+let swipeThreshold = 100;
 let currentSwipingCard = null;
+
+
+function encodePizzasToUrl() {
+    if (pizzas.length === 0) return null;
+
+   
+    const simplePizzas = pizzas.map(p => ({
+        n: p.name,
+        a: p.amount,
+        d: p.diameter,
+        p: p.price
+    }));
+
+   
+    return encodeURIComponent(JSON.stringify(simplePizzas));
+}
+
+function decodePizzasFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const encodedData = urlParams.get('data');
+
+    if (!encodedData) return null;
+
+    try {
+        const simplePizzas = JSON.parse(decodeURIComponent(encodedData));
+
+       
+        return simplePizzas.map(sp => calculatePizza(sp.n, sp.a, sp.d, sp.p));
+    } catch (e) {
+        console.error("Error decoding pizza data from URL:", e);
+        return null;
+    }
+}
+
+function updateUrlWithPizzaData() {
+    const encodedData = encodePizzasToUrl();
+    if (!encodedData) {
+       
+        history.replaceState({}, '', window.location.pathname);
+        return;
+    }
+
+   
+    const url = new URL(window.location.href);
+    url.search = `?data=${encodedData}`;
+    history.replaceState({}, '', url.href);
+}
+
+function generateShareableLink() {
+    const encodedData = encodePizzasToUrl();
+    if (!encodedData) {
+        showInfoModal("Add at least one pizza before sharing.");
+        return null;
+    }
+
+    const url = new URL(window.location.href);
+    url.search = `?data=${encodedData}`;
+    return url.href;
+}
+
+function animateShareButton() {
+    const shareBtn = document.getElementById('shareBtn');
+
+    if (pizzas.length === 0) {
+        showInfoModal("Add at least one pizza before sharing.");
+        return;
+    }
+
+    const link = generateShareableLink();
+    if (!link) return;
+   
+    if (shareBtn.classList.contains('copied') ||
+        shareBtn.hasAttribute('data-animating')) {
+        return;
+    }
+
+    navigator.clipboard.writeText(link).then(() => {
+        // Add copied class to trigger the slide animation
+        shareBtn.classList.add('copied');
+
+        // Wait for animation to complete before reverting
+        setTimeout(() => {
+            // Add animating attribute to control return animation
+            shareBtn.setAttribute('data-animating', 'returning');
+            shareBtn.classList.remove('copied');
+
+            // Remove the animating attribute when animation completes
+            setTimeout(() => {
+                shareBtn.removeAttribute('data-animating');
+            }, 500); // Match this with the animation duration in CSS
+        }, 1500); // Extend this time to show the success state longer
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+        showInfoModal("Failed to copy to clipboard. Please try again.");
+    });
+}
 
 function addPizza() {
     const name = document.getElementById("name").value;
@@ -25,12 +120,13 @@ function addPizza() {
     }
 
     const pizza = calculatePizza(name, amount, diameter, price);
-    pizza.id = Date.now(); // Add a unique ID to each pizza
+    pizza.id = Date.now();
     pizzas.push(pizza);
     calculateRanks();
     updateTable();
     updateCards();
     updateSortIndicators();
+    updateUrlWithPizzaData();
 
     document.getElementById("name").value = "";
     document.getElementById("amount").value = "";
@@ -51,62 +147,51 @@ function calculatePizza(name, amount, diameter, price) {
 }
 
 function calculateRanks() {
-    // Sort by price per square cm for value ranking
-    const sortedByValue = [...pizzas].sort((a, b) => a.pricePerCm2 - b.pricePerCm2);
-
-    // Assign value ranks with ties getting the same rank and proper skipping
-    let currentRank = 1;
-    let previousValue = null;
-    let tieCount = 0;
-
-    sortedByValue.forEach((pizza, index) => {
-        // If this is a new value (not tied with previous), update the rank
-        if (index === 0 || pizza.pricePerCm2 !== previousValue) {
-            currentRank = index + 1; // This correctly accounts for skipped ranks after ties
-            tieCount = 0;
-        } else {
-            // This is a tie with the previous value
-            tieCount++;
-        }
-
-        pizza.valueRank = currentRank;
-        previousValue = pizza.pricePerCm2;
-    });
-
-    // Sort by selected column for display order
     rankedPizzas = [...pizzas].sort((a, b) => {
         if (a[sortColumn] < b[sortColumn]) return sortOrder === 'asc' ? -1 : 1;
         if (a[sortColumn] > b[sortColumn]) return sortOrder === 'asc' ? 1 : -1;
         return 0;
     });
 
-    // Assign display ranks with proper skipping after ties
-    let displayRank = 1;
-    let previousDisplayValue = null;
-    let displayTieCount = 0;
+    let uniqueValues = new Set(pizzas.map(pizza => pizza[sortColumn]));
+    let maxRank = uniqueValues.size;
+
+    let displayRank = 0;
+    let sameValueCount = 0;
+    let previousValue = null;
+
 
     rankedPizzas.forEach((pizza, index) => {
-        if (index === 0 || pizza[sortColumn] !== previousDisplayValue) {
-            displayRank = index + 1; // This correctly accounts for skipped ranks after ties
-            displayTieCount = 0;
+        const currentValue = pizza[sortColumn];
+
+        if (index === 0 || Math.abs(currentValue - previousValue) > 0.00001) {
+            // New value, so assign rank based on position
+            displayRank += 1;
+            sameValueCount = 0;
         } else {
-            // This is a tie with the previous value
-            displayTieCount++;
+            sameValueCount++;
         }
 
         pizza.rank = displayRank;
-        previousDisplayValue = pizza[sortColumn];
+        previousValue = currentValue;
+        if (sortColumn === 'pricePerCm2' || sortColumn === 'price' || sortColumn === 'totalPrice') {
+            if (sortOrder === 'asc') {
+                pizza.valueRank = Math.min(displayRank, 6);
+            } else {
+                pizza.valueRank = Math.min(maxRank + 1 - displayRank, 6);
+            }
+        } else {
+             if (sortOrder === 'asc') {
+                pizza.valueRank = Math.min(maxRank + 1 - displayRank, 6);
+            } else {
+                pizza.valueRank = Math.min(displayRank, 6);
+            }
+        }
     });
 }
 
-function toggleRanking() {
-    isRanked = !isRanked;
-    updateTable();
-    updateCards();
-}
-
 function sortTable(column) {
-    if (column === 'rank') {
+    if (column === 'rank' || column === 'name') {
         return;
     }
 
@@ -135,31 +220,17 @@ function updateSortIndicators() {
     }
 }
 
-function getRankColorClass(valueRank) {
-    if (valueRank === 1) return 'rank-1';
-    if (valueRank === 2) return 'rank-2';
-    if (valueRank === 3) return 'rank-3';
-    if (valueRank === 4) return 'rank-4';
-    if (valueRank === 5) return 'rank-5';
-    return 'rank-worst';
-}
-
 function updateTable() {
     const tableBody = document.getElementById("pizzaTable");
     tableBody.innerHTML = "";
 
-    const displayList = isRanked ? rankedPizzas : pizzas;
-    displayList.forEach((pizza, index) => {
+    const displayList = rankedPizzas;
+    displayList.forEach((pizza, _) => {
         const row = document.createElement('tr');
 
         const rankCell = document.createElement('td');
         rankCell.textContent = pizza.rank || '-';
-
-        if (pizza.valueRank > 5) {
-            rankCell.className = 'rank-value-worst';
-        } else {
-            rankCell.className = `rank-value-${pizza.valueRank}`;
-        }
+        rankCell.className = `rank-value-${pizza.valueRank}`;
 
         row.appendChild(rankCell);
 
@@ -190,22 +261,15 @@ function updateCards() {
     const cardsContainer = document.getElementById("pizzaCards");
     cardsContainer.innerHTML = "";
 
-    const displayList = isRanked ? rankedPizzas : pizzas;
-
-    displayList.forEach((pizza, index) => {
+    rankedPizzas.forEach((pizza, index) => {
         const card = document.createElement('div');
 
         let rankClass;
-        if (pizza.valueRank > 5) {
-            rankClass = 'rank-worst';
-        } else {
-            rankClass = `rank-${pizza.valueRank}`;
-        }
+        rankClass = `rank-${pizza.valueRank}`;
 
         card.className = `pizza-card ${rankClass}`;
         card.dataset.index = index;
 
-        // Add visible circular action icons outside the card
         card.innerHTML = `
             <div class="swipe-action-visible edit-icon-visible">
                 <i class="material-icons swipe-icon-edit">edit</i>
@@ -247,7 +311,7 @@ function updateCards() {
             </div>
         `;
 
-        // Add touch/swipe event listeners
+       
         card.addEventListener('touchstart', handleTouchStart);
         card.addEventListener('touchmove', handleTouchMove);
         card.addEventListener('touchend', handleTouchEnd);
@@ -256,10 +320,9 @@ function updateCards() {
     });
 }
 
-// Edit and Delete Functions
+
 function openEditModal(index) {
-    const displayList = isRanked ? rankedPizzas : pizzas;
-    const pizza = displayList[index];
+    const pizza = rankedPizzas[index];
     const actualIndex = pizzas.indexOf(pizza);
     editingIndex = actualIndex;
 
@@ -269,27 +332,33 @@ function openEditModal(index) {
     document.getElementById("editPrice").value = pizza.price;
     document.getElementById("editIndex").value = actualIndex;
 
-    // Ensure any open card is reset before showing the modal
+   
     resetAllCards();
     document.getElementById("editModal").style.display = "flex";
 }
 
 function openDeleteModal(index) {
-    const displayList = isRanked ? rankedPizzas : pizzas;
-    const pizza = displayList[index];
-    const actualIndex = pizzas.indexOf(pizza);
-    deletingIndex = actualIndex;
+    const pizza = rankedPizzas[index];
+    deletingIndex = pizzas.indexOf(pizza);
 
     document.getElementById("pizzaToDeleteName").textContent = pizza.name;
 
-    // Ensure any open card is reset before showing the modal
+   
     resetAllCards();
     document.getElementById("deleteConfirmModal").style.display = "flex";
 }
 
 function closeModal(modalId) {
-    document.getElementById(modalId).style.display = "none";
-    resetAllCards(); // Always reset cards when closing a modal
+    const modal = document.getElementById(modalId);
+
+    modal.style.opacity = '0';
+
+    setTimeout(() => {
+        modal.style.display = "none";
+        modal.style.opacity = '';
+    }, 300);
+
+    resetAllCards();
 }
 
 function savePizzaEdit() {
@@ -304,7 +373,7 @@ function savePizzaEdit() {
     }
 
     const updatedPizza = calculatePizza(name, amount, diameter, price);
-    // Preserve the ID if it exists
+   
     if (pizzas[editingIndex].id) {
         updatedPizza.id = pizzas[editingIndex].id;
     }
@@ -314,6 +383,7 @@ function savePizzaEdit() {
     calculateRanks();
     updateTable();
     updateCards();
+    updateUrlWithPizzaData();
     closeModal('editModal');
 }
 
@@ -322,6 +392,7 @@ function confirmDeletePizza() {
     calculateRanks();
     updateTable();
     updateCards();
+    updateUrlWithPizzaData();
     closeModal('deleteConfirmModal');
 }
 
@@ -329,17 +400,17 @@ function deletePizza(index) {
     openDeleteModal(index);
 }
 
-// Touch handling functions
+
 function handleTouchStart(e) {
     startX = e.touches[0].clientX;
     currentX = startX;
     isSwiping = true;
 
-    // Store the card being swiped
+   
     currentSwipingCard = e.currentTarget;
     currentSwipingCard.classList.add('swiping');
 
-    // Reset any existing transformations
+   
     currentSwipingCard.style.transform = 'translateX(0)';
 }
 
@@ -349,10 +420,12 @@ function handleTouchMove(e) {
     currentX = e.touches[0].clientX;
     const diffX = currentX - startX;
 
-    // Apply the translation to follow the finger
-    currentSwipingCard.style.transform = `translateX(${diffX}px)`;
+   
+    const resistance = 0.7;
+    const translateX = diffX * resistance;
+    currentSwipingCard.style.transform = `translateX(${translateX}px)`;
 
-    // Add visual indication of action based on swipe direction
+   
     if (diffX > 0) {
         currentSwipingCard.classList.add('swipe-left-active');
         currentSwipingCard.classList.remove('swipe-right-active');
@@ -364,32 +437,43 @@ function handleTouchMove(e) {
     }
 }
 
-function handleTouchEnd(e) {
+function handleTouchEnd(_) {
     if (!isSwiping || !currentSwipingCard) return;
 
     const diffX = currentX - startX;
-    const index = parseInt(currentSwipingCard.dataset.index);
+    const index = currentSwipingCard.dataset.index;
 
-    // Reset the card position
-    currentSwipingCard.style.transform = 'translateX(0)';
+   
+    currentSwipingCard.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    currentSwipingCard.style.transform = 'translateX(0) rotate(0deg)';
+
+   
+    setTimeout(() => {
+        if (currentSwipingCard) {
+            currentSwipingCard.style.transition = '';
+        }
+    }, 300);
+
     currentSwipingCard.classList.remove('swiping');
     currentSwipingCard.classList.remove('swipe-left-active', 'swipe-right-active');
 
-    // Perform action based on swipe direction and distance
+   
     if (diffX > swipeThreshold) {
-        // Swiped right -> Edit
-        setTimeout(() => openEditModal(index), 10);
+       
+       
+        setTimeout(() => openEditModal(index), 310);
     } else if (diffX < -swipeThreshold) {
-        // Swiped left -> Delete
-        setTimeout(() => deletePizza(index), 10);
+       
+       
+        setTimeout(() => deletePizza(index), 310);
     }
 
-    // Reset flags
+   
     isSwiping = false;
     currentSwipingCard = null;
 }
 
-// Helper function to reset all cards to their original position
+
 function resetAllCards() {
     const cards = document.querySelectorAll('.pizza-card');
     cards.forEach(card => {
@@ -397,31 +481,42 @@ function resetAllCards() {
         card.classList.remove('swiping', 'swipe-left-active', 'swipe-right-active');
     });
 
-    // Reset the global variables
+   
     isSwiping = false;
     currentSwipingCard = null;
 }
 
-// Show info modal with custom message
+
 function showInfoModal(message) {
     document.getElementById('infoMessage').textContent = message;
     document.getElementById('infoModal').style.display = 'flex';
 }
 
-// Initialize event listeners when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Set up button click handlers
-    document.getElementById('addPizzaBtn').addEventListener('click', addPizza);
-    document.getElementById('toggleRankingBtn').addEventListener('click', toggleRanking);
 
-    // Prevent default form submission
+document.addEventListener('DOMContentLoaded', function() {
+   
+    document.getElementById('addPizzaBtn').addEventListener('click', addPizza);
+
+   
+    document.getElementById('shareBtn').addEventListener('click', animateShareButton);
+
+   
     document.getElementById('pizzaForm').addEventListener('submit', function(event) {
         event.preventDefault();
         addPizza();
     });
 
-    // Set up delete confirmation
+   
     document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDeletePizza);
+
+   
+    const urlPizzas = decodePizzasFromUrl();
+    if (urlPizzas && urlPizzas.length > 0) {
+        pizzas = urlPizzas;
+        calculateRanks();
+        updateTable();
+        updateCards();
+    }
 
     updateSortIndicators();
 });
@@ -430,16 +525,15 @@ window.addEventListener('load', function() {
     updateSortIndicators();
 });
 
-// Close modal when clicking outside - with card reset for safety
+
 window.onclick = function(event) {
     if (event.target === document.getElementById('editModal')) {
         closeModal('editModal');
         resetAllCards();
     }
-    // Remove the delete modal background click handler to prevent it from closing
+
     if (event.target === document.getElementById('infoModal')) {
         closeModal('infoModal');
         resetAllCards();
     }
 }
-
