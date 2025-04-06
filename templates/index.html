@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icon.png') }}" type="image/png">
+    <meta name="theme-color" content="#BB86FC">
     <script src="{{ url_for('static', filename='index.js') }}"></script>
 </head>
 <body>
@@ -57,12 +60,16 @@
                             Price
                             <span class="sort-indicator"></span>
                         </th>
-                        <th scope="col" class="sortable" id="sort-totalPrice" onclick="sortTable('totalPrice')">
-                            Total Price
-                            <span class="sort-indicator"></span>
-                        </th>
                         <th scope="col" class="sortable" id="sort-pricePerCm2" onclick="sortTable('pricePerCm2')">
                             Price per cm²
+                            <span class="sort-indicator"></span>
+                        </th>
+                        <th scope="col" class="sortable" id="sort-totalArea" onclick="sortTable('totalArea')">
+                            Total Area
+                            <span class="sort-indicator"></span>
+                        </th>
+                        <th scope="col" class="sortable" id="sort-totalPrice" onclick="sortTable('totalPrice')">
+                            Total Price
                             <span class="sort-indicator"></span>
                         </th>
                         <th scope="col">Actions</th>

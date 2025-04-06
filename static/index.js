@@ -143,7 +143,7 @@ function calculatePizza(name, amount, diameter, price) {
     const area = Math.PI * Math.pow(radius, 2) * amount;
     const pricePerCm2 = price * amount / area;
     const totalPrice = price * amount;
-    return { name, amount, diameter, price, pricePerCm2, totalPrice };
+    return { name, amount, diameter, price, pricePerCm2, totalPrice, totalArea: area };
 }
 
 function calculateRanks() {
@@ -237,10 +237,11 @@ function updateTable() {
         row.innerHTML += `
             <td>${pizza.name}</td>
             <td>${pizza.amount}</td>
-            <td>${pizza.diameter}</td>
+            <td>${pizza.diameter} cm²</td>
             <td>${pizza.price.toFixed(2)}</td>
-            <td>${pizza.totalPrice.toFixed(2)}</td>
             <td>${pizza.pricePerCm2.toFixed(4)}</td>
+            <td>${Math.round(pizza.totalArea).toFixed(0)} cm²</td>
+            <td>${pizza.totalPrice.toFixed(2)}</td>
             <td>
                 <div class="action-buttons">
                     <button class="btn-edit" onclick="openEditModal(${displayList.indexOf(pizza)})" title="Edit">
