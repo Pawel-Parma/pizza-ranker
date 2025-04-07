@@ -1026,6 +1026,7 @@ tbody tr:last-child td {
         opacity: 0.15;
         z-index: 0;
         pointer-events: none;
+        border-radius: var(--border-radius-md); /* Add border radius to match the card */
     }
 
     .pizza-card.rank-1::before {
