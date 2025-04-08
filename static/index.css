@@ -354,7 +354,7 @@ tbody tr:last-child td {
     z-index: 0;
 }
 
-.rank-value-6::before {
+.rank-value-6::after {
     content: '';
     position: absolute;
     top: 0;
@@ -1176,7 +1176,7 @@ tbody tr:last-child td {
         font-size: 1rem;
     }
 
-    .price-per-cm2 {
+    .price-per-u2 {
         background-color: var(--surface-color-lighter);
         padding: calc(var(--spacing-unit));
         margin-top: calc(var(--spacing-unit) * 1.5);
@@ -1186,7 +1186,7 @@ tbody tr:last-child td {
         z-index: 1;
     }
 
-    .price-per-cm2 .detail-value {
+    .price-per-u2 .detail-value {
         color: var(--secondary-color);
         font-weight: 700;
         font-size: 1.1rem;
