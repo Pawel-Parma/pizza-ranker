@@ -440,14 +440,27 @@ tbody tr:last-child td {
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.15s ease; /* Changed from 0.3s to 0.15s (faster) */
+    -webkit-transition: opacity 0.15s ease; /* Added for mobile webkit browsers */
+}
+
+.modal.closing {
+    opacity: 0;
+    pointer-events: none; /* Prevent interaction during closing animation */
 }
 
 .modal[style*="display: flex"] {
-    animation: modalFadeIn 0.3s forwards;
+    animation: modalFadeIn 0.15s forwards; /* Changed from 0.3s to 0.15s (faster) */
+    -webkit-animation: modalFadeIn 0.15s forwards; /* Added for mobile webkit browsers */
+    will-change: opacity; /* Performance optimization */
 }
 
 @keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@-webkit-keyframes modalFadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
@@ -462,7 +475,14 @@ tbody tr:last-child td {
     position: relative;
     transform: translateY(10px);
     opacity: 0;
-    animation: modalSlideUp 0.3s 0.1s ease-out forwards;
+    animation: modalSlideUp 0.15s 0.033s ease-out forwards; /* Changed from 0.3s/0.1s to 0.15s/0.033s (faster) */
+    -webkit-animation: modalSlideUp 0.15s 0.033s ease-out forwards; /* Added for mobile webkit browsers */
+    will-change: transform, opacity; /* Performance optimization */
+}
+
+.closing .modal-content {
+    animation: modalSlideDown 0.12s ease-in forwards; /* New animation for closing */
+    -webkit-animation: modalSlideDown 0.12s ease-in forwards; /* Added for mobile webkit browsers */
 }
 
 @keyframes modalSlideUp {
@@ -473,6 +493,39 @@ tbody tr:last-child td {
     to { 
         transform: translateY(0); 
         opacity: 1; 
+    }
+}
+
+@-webkit-keyframes modalSlideUp {
+    from { 
+        transform: translateY(10px); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
+}
+
+@keyframes modalSlideDown {
+    from { 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
+    to { 
+        transform: translateY(8px); 
+        opacity: 0; 
+    }
+}
+
+@-webkit-keyframes modalSlideDown {
+    from { 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
+    to { 
+        transform: translateY(8px); 
+        opacity: 0; 
     }
 }
 
@@ -920,15 +973,15 @@ tbody tr:last-child td {
         position: relative;
         overflow: visible;
         transform: translateX(0);
-        transition: transform 0.3s ease;
         touch-action: pan-y;
         user-select: none;
+        will-change: transform;
     }
 
     .pizza-card.swiping {
-        transition: none;
+        transition: none !important;
+        will-change: transform;
     }
-
 
     .swipe-indicator {
         display: none;
@@ -937,7 +990,6 @@ tbody tr:last-child td {
     .swipe-actions {
         display: none;
     }
-
 
     .swipe-action-visible {
         position: absolute;
@@ -950,7 +1002,6 @@ tbody tr:last-child td {
         align-items: center;
         justify-content: center;
         opacity: 0;
-        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         z-index: 10;
     }
 
@@ -969,37 +1020,31 @@ tbody tr:last-child td {
     .swipe-icon-edit,
     .swipe-icon-delete {
         font-size: 24px;
-        transition: transform 0.3s ease;
     }
 
     .swipe-left-active .edit-icon-visible {
         opacity: 1;
         left: -70px;
         transform: translateY(-50%) scale(1);
-        animation: pulseIcon 1s infinite alternate;
     }
 
     .swipe-right-active .delete-icon-visible {
         opacity: 1;
         right: -70px;
         transform: translateY(-50%) scale(1);
-        animation: pulseIcon 1s infinite alternate;
     }
 
     @keyframes pulseIcon {
         0% { transform: translateY(-50%) scale(1); }
-        100% { transform: translateY(-50%) scale(1.1); }
+        100% { transform: translateY(-50%) scale(1); }
     }
 
     .swipe-left-active .swipe-icon-edit,
     .swipe-right-active .swipe-icon-delete {
-        animation: wiggle 1s ease infinite;
     }
 
     @keyframes wiggle {
         0%, 100% { transform: rotate(0); }
-        25% { transform: rotate(-15deg); }
-        75% { transform: rotate(15deg); }
     }
 
     .pizza-card.swipe-left-active {
@@ -1026,7 +1071,7 @@ tbody tr:last-child td {
         opacity: 0.15;
         z-index: 0;
         pointer-events: none;
-        border-radius: var(--border-radius-md); /* Add border radius to match the card */
+        border-radius: var(--border-radius-md);
     }
 
     .pizza-card.rank-1::before {
@@ -1079,6 +1124,7 @@ tbody tr:last-child td {
         position: relative;
         z-index: 3;
         text-align: center;
+
     }
 
     .pizza-card.rank-1 .pizza-rank {
@@ -1149,6 +1195,15 @@ tbody tr:last-child td {
     .modal-content {
         width: 95%;
         padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 2);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+    }
+
+    .closing .modal-content {
+        animation-duration: 0.1s;
+        -webkit-animation-duration: 0.1s;
     }
 
     .modal-header {

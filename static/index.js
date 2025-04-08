@@ -322,6 +322,19 @@ function updateCards() {
 }
 
 
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    
+    // Reset any previous animation state
+    modal.classList.remove('closing');
+    
+    // Force reflow to ensure animations work properly on mobile
+    void modal.offsetWidth;
+    
+    // Display the modal
+    modal.style.display = "flex";
+}
+
 function openEditModal(index) {
     const pizza = rankedPizzas[index];
     const actualIndex = pizzas.indexOf(pizza);
@@ -333,9 +346,8 @@ function openEditModal(index) {
     document.getElementById("editPrice").value = pizza.price;
     document.getElementById("editIndex").value = actualIndex;
 
-   
     resetAllCards();
-    document.getElementById("editModal").style.display = "flex";
+    openModal("editModal");
 }
 
 function openDeleteModal(index) {
@@ -344,21 +356,30 @@ function openDeleteModal(index) {
 
     document.getElementById("pizzaToDeleteName").textContent = pizza.name;
 
-   
     resetAllCards();
-    document.getElementById("deleteConfirmModal").style.display = "flex";
+    openModal("deleteConfirmModal");
 }
 
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
-
-    modal.style.opacity = '0';
-
-    setTimeout(() => {
-        modal.style.display = "none";
-        modal.style.opacity = '';
-    }, 300);
-
+    
+    // Force reflow to ensure animations work on mobile
+    void modal.offsetWidth;
+    
+    // Apply the closing animation class
+    modal.classList.add('closing');
+    
+    // Use a shorter timeout for mobile
+    const timeoutDuration = 100;
+    
+    // Use requestAnimationFrame for smoother animation, especially on mobile
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            modal.style.display = "none";
+            modal.classList.remove('closing');
+        }, timeoutDuration);
+    });
+    
     resetAllCards();
 }
 
@@ -406,12 +427,12 @@ function handleTouchStart(e) {
     startX = e.touches[0].clientX;
     currentX = startX;
     isSwiping = true;
-
-   
+    
     currentSwipingCard = e.currentTarget;
     currentSwipingCard.classList.add('swiping');
-
-   
+    
+    // Remove any existing transition
+    currentSwipingCard.style.transition = 'none';
     currentSwipingCard.style.transform = 'translateX(0)';
 }
 
@@ -421,12 +442,9 @@ function handleTouchMove(e) {
     currentX = e.touches[0].clientX;
     const diffX = currentX - startX;
 
-   
-    const resistance = 0.7;
-    const translateX = diffX * resistance;
-    currentSwipingCard.style.transform = `translateX(${translateX}px)`;
+    // Directly move the card with finger without easing
+    currentSwipingCard.style.transform = `translateX(${diffX}px)`;
 
-   
     if (diffX > 0) {
         currentSwipingCard.classList.add('swipe-left-active');
         currentSwipingCard.classList.remove('swipe-right-active');
@@ -444,45 +462,32 @@ function handleTouchEnd(_) {
     const diffX = currentX - startX;
     const index = currentSwipingCard.dataset.index;
 
-   
-    currentSwipingCard.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-    currentSwipingCard.style.transform = 'translateX(0) rotate(0deg)';
-
-   
-    setTimeout(() => {
-        if (currentSwipingCard) {
-            currentSwipingCard.style.transition = '';
-        }
-    }, 300);
-
+    // Reset card position immediately without animation
+    currentSwipingCard.style.transform = 'translateX(0)';
+    
     currentSwipingCard.classList.remove('swiping');
     currentSwipingCard.classList.remove('swipe-left-active', 'swipe-right-active');
 
-   
+    // Trigger actions immediately without delay
     if (diffX > swipeThreshold) {
-       
-       
-        setTimeout(() => openEditModal(index), 310);
+        openEditModal(index);
     } else if (diffX < -swipeThreshold) {
-       
-       
-        setTimeout(() => deletePizza(index), 310);
+        openDeleteModal(index);
     }
 
-   
     isSwiping = false;
     currentSwipingCard = null;
 }
 
-
 function resetAllCards() {
     const cards = document.querySelectorAll('.pizza-card');
     cards.forEach(card => {
+        // Remove transitions for immediate reset
+        card.style.transition = 'none';
         card.style.transform = 'translateX(0)';
         card.classList.remove('swiping', 'swipe-left-active', 'swipe-right-active');
     });
 
-   
     isSwiping = false;
     currentSwipingCard = null;
 }
@@ -490,27 +495,27 @@ function resetAllCards() {
 
 function showInfoModal(message) {
     document.getElementById('infoMessage').textContent = message;
-    document.getElementById('infoModal').style.display = 'flex';
+    openModal('infoModal');
 }
 
 
 document.addEventListener('DOMContentLoaded', function() {
-   
+
     document.getElementById('addPizzaBtn').addEventListener('click', addPizza);
 
-   
+
     document.getElementById('shareBtn').addEventListener('click', animateShareButton);
 
-   
+
     document.getElementById('pizzaForm').addEventListener('submit', function(event) {
         event.preventDefault();
         addPizza();
     });
 
-   
+
     document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDeletePizza);
 
-   
+
     const urlPizzas = decodePizzasFromUrl();
     if (urlPizzas && urlPizzas.length > 0) {
         pizzas = urlPizzas;
@@ -520,6 +525,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     updateSortIndicators();
+
+    // Prevent scroll/zoom when interacting with modals on mobile
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('touchmove', e => {
+            e.preventDefault();
+        }, { passive: false });
+    });
 });
 
 window.addEventListener('load', function() {
