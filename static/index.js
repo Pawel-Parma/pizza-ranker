@@ -500,13 +500,18 @@ function initializeApp() {
     window.addEventListener('click', function(event) {
         const editModal = document.getElementById('editModal');
         const infoModal = document.getElementById('infoModal');
-        
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+
         if (event.target === editModal) {
             closeModal('editModal');
         }
         
         if (event.target === infoModal) {
             closeModal('infoModal');
+        }
+
+        if (event.target === deleteConfirmModal) {
+            closeModal('deleteConfirmModal');
         }
     });
 
@@ -525,6 +530,19 @@ function initializeApp() {
     }
 
     updateSortIndicators();
+
+    // Add keyboard event listeners for modals
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modals = ['editModal', 'infoModal', 'deleteConfirmModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal.style.display === 'flex') {
+                    closeModal(modalId);
+                }
+            });
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', initializeApp);
