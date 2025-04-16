@@ -172,6 +172,15 @@ function animateShareButton() {
         });
 }
 
+function updateView() {
+    const tableIsVisible = window.getComputedStyle(document.querySelector('.table-container table')).display !== 'none';
+    if (tableIsVisible) {
+        updateTable();
+    } else {
+        updateCards();
+    }
+}
+
 function addPizza() {
     const name = document.getElementById("name").value;
     const amount = parseInt(document.getElementById("amount").value);
@@ -187,8 +196,7 @@ function addPizza() {
     state.pizzas.push(pizza);
     
     calculateRanks();
-    updateTable();
-    updateCards();
+    updateView();
     updateSortIndicators();
     updateUrlWithPizzaData();
 
@@ -211,8 +219,7 @@ function sortTable(column) {
     }
     
     calculateRanks();
-    updateTable();
-    updateCards();
+    updateView();
     updateSortIndicators();
 }
 
@@ -407,8 +414,8 @@ function savePizzaEdit() {
 
     closeModal('editModal');
     calculateRanks();
-    updateTable();
-    updateCards();
+    updateView();
+    updateSortIndicators();
     updateUrlWithPizzaData();
 }
 
@@ -417,8 +424,8 @@ function confirmDeletePizza() {
     
     closeModal('deleteConfirmModal');
     calculateRanks();
-    updateTable();
-    updateCards();
+    updateView();
+    updateSortIndicators();
     updateUrlWithPizzaData();
 }
 
@@ -441,10 +448,8 @@ function handleTouchMove(e) {
     state.swipe.currentX = e.touches[0].clientX;
     const diffX = state.swipe.currentX - state.swipe.startX;
 
-    // Move card with finger movement
     state.swipe.currentCard.style.transform = `translateX(${diffX}px)`;
 
-    // Add appropriate visual feedback
     if (diffX > 0) {
         state.swipe.currentCard.classList.add('swipe-left-active');
         state.swipe.currentCard.classList.remove('swipe-right-active');
@@ -525,13 +530,19 @@ function initializeApp() {
     if (urlPizzas && urlPizzas.length > 0) {
         state.pizzas = urlPizzas;
         calculateRanks();
-        updateTable();
-        updateCards();
+        updateView();
     }
 
+    updateTable();
+    updateCards();
     updateSortIndicators();
 
-    // Add keyboard event listeners for modals
+    window.addEventListener('resize', function() {
+        if (state.pizzas.length > 0) {
+            updateView();
+        }
+    });
+
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             const modals = ['editModal', 'infoModal', 'deleteConfirmModal'];
