@@ -134,7 +134,6 @@ function calculateRanks() {
                 ? Math.min(maxRank + 1 - displayRank, 6) 
                 : Math.min(displayRank, 6);
         }
-        console.log(state.sortColumn);
     });
 }
 
